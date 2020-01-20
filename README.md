@@ -3,4 +3,4 @@ Shiny app for estimate emissions and their uncertainty for Energy Sector in Colo
 
 How to download
 
-1. Directly clonning 'APP Energia.zip'
+1. Directly cloning Repository
