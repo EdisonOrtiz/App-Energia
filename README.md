@@ -7,7 +7,7 @@ Packages required: triangle, openxlsx, nleqslv, fitdistrplus, ggplot2, reshape2,
 
 If you are using R, Rstudio or Shiny for first time:
 
-1. Install R language (> 3.6) {http://archive.linux.duke.edu/cran/bin/windows/base/R-3.6.2-win.exe}
+1. Install R language (> 3.6) {http://archive.linux.duke.edu/cran/bin/windows/base/}
 2. After installing R language, install R studio {https://download1.rstudio.org/desktop/windows/RStudio-1.2.5033.exe}
 3. Open R studio, and configure default text encoding as UTF-8: Tools->Global Options->Code->Saving->Default Text Encoding->UTF-8
 4. Install required libraries or packages typing in R Studio console:
