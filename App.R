@@ -177,7 +177,7 @@ server <- function(input, output) {
       file.remove("R2 ENE.csv")}
       ## Generando archivo de emisiones totales del sector
       DAT=read.csv(r2_file)
-      GWP=read.csv(paste0("./Scripts/GWP.csv"))
+      GWP=read.csv(paste0("./Scripts/GWP.csv"),fileEncoding="latin1")
       
       gwp=GWP[c(4,3)]
       
