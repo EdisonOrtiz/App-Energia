@@ -4,7 +4,7 @@ r2_file="./Emisiones Base/R2 ENE.csv"
 r2_tot="./Emisiones Base/R2 TOT.csv"
 r2_sect="./Emisiones Base/R2 SECT.csv"
 gr_table="./Emisiones Base/Datos usados en gráfica.xlsx"
-comp_file="./Base de Datos/Información Adicional.xlsx"
+comp_file="./Base de datos/Información Adicional.xlsx"
 dir.base="./Emisiones Base"
 if (!dir.exists(dir.base)){dir.create(dir.base)}
 
