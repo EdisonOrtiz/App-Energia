@@ -3,6 +3,7 @@ library(shiny)
 r2_file="./Emisiones Base/R2 ENE.csv"
 r2_tot="./Emisiones Base/R2 TOT.csv"
 r2_sect="./Emisiones Base/R2 SECT.csv"
+gr_table="./Emisiones Base/Datos usados en gráfica.xlsx"
 comp_file="./Base de Datos/Información Adicional.xlsx"
 dir.base="./Emisiones Base"
 if (!dir.exists(dir.base)){dir.create(dir.base)}
@@ -26,8 +27,9 @@ ui <- shinyUI(
                  sidebarPanel(
                    ## Caja para la selección de la base de datos en excel
                    fluidRow(column(12,fileInput("flx", "Selección de Base de datos",buttonLabel = "Buscar",placeholder="No hay ningun archivo seleccionado",width = 800))),
-                   actionButton("doCALC", "Calcular Emisiones GEI",width=200,style="color: #fff; background-color: #337ab7; border-color: #2e6da4",icon("play-circle"))
-                 ),
+                   actionButton("doCALC", "Calcular Emisiones GEI",width=200,style="color: #fff; background-color: #337ab7; border-color: #2e6da4",icon("play-circle")),
+                   plotOutput("logo1"),
+                   h6("Herramienta desarrollada por Edison Y. Ortiz, MSc")),
                  mainPanel(h2("Instrucciones"),
                            h4("General"),
                            p("Este aplicativo esta basado en código R, con interfaz HTML. Este aplicativo permite estimar las emisiones y su respectiva incertidumbre de emisiones
@@ -36,13 +38,13 @@ ui <- shinyUI(
                            p(strong("Gráficas:"),"Pestaña en la cual se pueden obtener distintas gráficas dependiendo de las opciones seleccionadas"),
                            p(strong("Tabla:"), "Pestaña en la cual se encontrarán los datos empleados para hacer la gráfica"),
                            p("Para el correcto funcionamiento de este aplicativo, se requiere que este instalado el lenguaje R, RStudio, y las siguientes librerías:"),
-                           p(em("triangle, openxlsx, nleqslv, fitdistrplus, ggplot2, reshape2, shiny"),"y todas las librerias requeridas por éstas"),
+                           p(em("triangle, openxlsx, nleqslv, fitdistrplus, ggplot2, reshape2, shiny, DT, imager"),"y todas las librerias requeridas por éstas"),
                            h4("Pestaña 'Estimación de emisiones'"),
                            p("1. Cargue la base de datos de actividades y factores de emisión con el boton",strong("Buscar"), ", puede ubicar este archivo en la Carpeta",em("Base de datos")),
                            p("2. Oprima el botón",strong("Calcular Emisiones GEI")),
                            p("3. Verifique las notificaciones en la esquina inferior derecha, si aparece ",span("Rojo",style="color:red")," indica que hay una falla en la base de datos, (no se ha cargado la base de datos o hay un error en la configuración de la base de datos. 
                              Si la notificación es",span("gris",style="color:gray"), "el aplicativo empezó a correr y se encontrará estimando las emisiones lo mas desagregadas posibles para el sector"),
-                           p("4. Cuando la notificación sea",span("azul",style="color:lightblue"),"el proceso habrá terminado y se debe haber generado el archivo 'R2 ENE.csv' en la carpeta",em("Emisiones Base")),
+                           p("4. Cuando la notificación sea",span("azul",style="color:lightblue"),"el proceso habrá terminado y se debe haber generado los archivos 'R2 ENE.csv', 'R2 SECT.csv' y 'R2 TOT.csv' en la carpeta",em("Emisiones Base")),
                            h4("Pestaña 'Gráfica'"),
                            p("1. Verifique que el archivo 'R2 ENE.csv exista, si no es así, estime las emisiones con la pestaña anterior"),
                            p("2. Seleccione los sectores que se desean graficar según interes"),
@@ -53,7 +55,14 @@ ui <- shinyUI(
                            p("7. Seleccione el rango de años a graficar"),
                            p("8. Oprima el botón ",strong("Graficar"),"para generar la gráfica deseada"),
                            h4("Pestaña 'Tabla'"),
-                           p("En esta pestaña aparecen los datos usandos para realizar la gráfica, en esta pestaña se puede filtrar la información, y buscar datos específicos"))
+                           p("En esta pestaña aparecen los datos usandos para realizar la gráfica, en esta pestaña se puede filtrar la información, y buscar datos específicos. Los datos usados para graficar son guardados en la carpeta",
+                             em("Emisiones Base")," y el archivo se llamará 'Datos usados en gráfica.xlsx'"),
+                           h4("Pestaña 'Resumen'"),
+                           p("En esta pestaña se grafican por defecto las emisiones GEI de la linea base, las emisiones del escenario de mitigación y las emisiones estimadas por el IDEAM en el BUR"),
+                           p("1. Verifique que los archivos 'R2 TOT.csv' y 'R2 SECT.csv', si no es así, estime las emisiones en la pestaña ",strong("Emisiones")),
+                           p("2. Oprima el botón", strong("Extraer Resultados")," para cargar los resultados obtenidos de estimación de emisiones de esta herramienta y actualizar las gráficas predeterminadas y generar información adicional,
+                             entre ellas la variación anual de los porcentajes de participación de emisiones por los distintos sectores del ministerio, la variación anual de los porcentajes de participación de cada uno de los GEI estimados
+                              y una tabla que muestra la evolución de las emisiones percápita del sector minero-energètico del país"))
                )
               ),
              tabPanel("Gráficas",
@@ -118,13 +127,13 @@ ui <- shinyUI(
                       mainPanel(plotOutput("gp",height  = "800"),
                                 verbatimTextOutput("info1")))
                       ),
-             tabPanel("Tabla",mainPanel(h3("Datos usados en la gráfica"),dataTableOutput("table"))),
+             tabPanel("Tabla",mainPanel(h3("Datos usados en la gráfica"),DT::dataTableOutput("table"))),
              tabPanel("Resumen",mainPanel(h3("Resumen general de emisiones"),
                                           actionButton("doRES","Extraer Resultados",width=200,style="color: #fff; background-color: #337ab7; border-color: #2e6da4",icon("chart-bar")),
                                           textOutput("ResInf")),
-                      fluidRow(column(6,plotOutput("res"),fluidRow(column(6,plotOutput("per")),
-                                                                   column(6,plotOutput("per2")))),
-                               column(6,dataTableOutput("tabler"))))
+                      fluidRow(column(6,plotOutput("res"),plotOutput("resS")),
+                               column(6,fluidRow(column(6,plotOutput("per")),
+                                                 column(6,plotOutput("per2"))),DT::dataTableOutput("tabler"))))
   )
 )
 
@@ -136,9 +145,19 @@ server <- function(input, output) {
   require(openxlsx)
   require(reshape2)
   require(scales)
+  require(imager)
   
-
-  
+   
+  #Cargando logos
+  logo1=load.image("./Scripts/pigccme.png")
+  output$logo1 <- renderPlot({ 
+    plot(logo1,xaxt = "n",yaxt="n")
+    axis(side = 1, col.ticks = "white",col="white")
+    axis(side=2,col.ticks = "white",col="white")
+    mtext("X",2,at=seq(-9999,9999,1),line=1,col = "white")
+    mtext("X",1,at=seq(-9999,9999,1),line=1,col = "white")
+    
+  })
   
     observeEvent(input$doCALC,{
     id=showNotification("Estimando Emisiones...",type="default",duration=NULL)
@@ -207,9 +226,12 @@ server <- function(input, output) {
                 addBubble = AB)
     
     tabla=A$data
+    tabla$UM=(tabla$UN+tabla$UP)/2
     tabla$UN=paste0(round(100*tabla$UN,0),"%")
     tabla$UP=paste0(round(100*tabla$UP,0),"%")
     tabla$EM=round(tabla$EM,3)
+    
+
     
     
     
@@ -233,13 +255,14 @@ server <- function(input, output) {
     names(tabla)[h]="Límite Superior [Mt CO2eq]"
     h=which(names(tabla)=="UM")
     if (length(h)!=0)
-    {tabla$UM=paste0(round(tabla$UM,0),"%")}
+    {tabla$UM=paste0(round(100*tabla$UM,0),"%")}
     names(tabla)[h]="Incertidumbre promedio [%]"
 
     
     
     tabla=tabla[-1]
     rownames(tabla)=NULL
+    write.xlsx(tabla,gr_table)
     tablaDT=datatable(tabla,
                       options=list(language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json'),
                                    pageLength = 100,
@@ -247,7 +270,7 @@ server <- function(input, output) {
                                    initComplete = JS(
                                      "function(settings, json) {",
                                      "$(this.api().table().header()).css({'background-color': '#0071BE', 'color': '#fff'});",
-                                     "$(this.api().table().header()).css({'font-size': '150%'});",
+                                     "$(this.api().table().header()).css({'font-size': '100%'});",
                                      "}")),
                       filter = list(position = 'top', clear = FALSE)
                       )
@@ -261,6 +284,52 @@ server <- function(input, output) {
     
   })
   
+  
+  
+  
+
+  
+  ## Grafica Base
+  Dt2=loadWorkbook(comp_file)
+  Pop=readWorkbook(Dt2,sheet=1,cols=c(1:2)) ## Población
+  Emis=readWorkbook(Dt2,sheet=2,startRow = 2)
+  names(Emis)[1]=c("Año")
+  Emis.melt=melt(Emis,id.vars="Año",value.name = "Emision")
+  Emis.melt$variable=gsub("."," ",Emis.melt$variable,fixed=T)
+  
+  
+  g=ggplot(Emis.melt,aes(Año,Emision))+geom_line(aes(color=variable),size=1)+
+    geom_point(aes(color=variable),size=2)+theme_bw()+
+    ylab(expression("Mt"~CO[2]*"eq."))+
+    scale_x_continuous(breaks=seq(2010,2030,2),minor_breaks = 2010:2030)+scale_y_continuous(breaks = seq(10,100,5))+
+    theme(legend.position = "bottom",legend.title = element_blank(),
+          text=element_text(size=20),legend.direction = "vertical")+
+    scale_color_brewer(palette = "Set1")
+  
+  ### Emisiones sectoriales
+  EmisS=readWorkbook(Dt2,sheet=3,startRow = 2,colNames = T)
+  EmisS.melt=melt(EmisS,id.vars="Año",value.name = "Emision")
+  EmisS.melt$variable=gsub("."," ",EmisS.melt$variable,fixed=T)
+  EmisS.melt$variable=factor(EmisS.melt$variable)
+  
+  
+    
+    cols=t(readWorkbook(Dt2,sheet=3,rows = 1:2,colNames = F))
+    cols=data.frame(cols[cols[,2]!="Año",])
+    
+    cols$X1=as.character(cols$X1)
+ 
+    cols$X2=factor(cols$X2,levels = levels(EmisS.melt$variable))
+    
+    cols=cols[order(cols$X2),]
+    
+    
+    gs=ggplot(EmisS.melt,aes(Año,Emision))+geom_line(aes(color=variable),size=1)+
+      geom_point(aes(color=variable),size=2)+theme_bw()+
+      ylab(expression("Mt"~CO[2]*"eq."))+scale_color_manual(name="Sector",breaks=cols$X2,values = cols$X1)+
+      theme(legend.position = "bottom",legend.direction = "vertical",text = element_text(size=20))
+    
+
   
   
   observeEvent(input$doRES,{
@@ -287,15 +356,21 @@ server <- function(input, output) {
       g1=ggplot(Tot2,aes(ANO,EM))+geom_bar(aes(fill=Sector),position="fill",stat="identity")+
         theme_bw()+scale_fill_brewer(palette = "YlOrRd")+
         scale_y_continuous("Porcentaje",breaks=seq(0,1,0.1),labels = scales::percent)+
-        scale_x_continuous("Año",breaks = seq(yr_min,yr_max,1))+theme(legend.position = "bottom",legend.direction = "vertical")
+        scale_x_continuous("Año",breaks = seq(yr_min,yr_max,1))+
+        theme(legend.position = "bottom",legend.direction = "vertical",text=element_text(size=20),
+              axis.text.x = element_text(angle = 90))
       
       g2=ggplot(Tot2,aes(ANO,EM))+geom_bar(aes(fill=GAS),position="fill",stat="identity")+
         theme_bw()+scale_fill_brewer(palette = "Greens")+
         scale_y_continuous("Porcentaje",breaks=seq(0,1,0.1),labels = scales::percent)+
-        scale_x_continuous("Año",breaks = seq(yr_min,yr_max,1))+theme(legend.position = "bottom",legend.direction = "vertical")
+        scale_x_continuous("Año",breaks = seq(yr_min,yr_max,1))+
+        theme(legend.position = "bottom",legend.direction = "vertical",text=element_text(size=20),
+              axis.text.x = element_text(angle = 90))
       Tot3=merge(Tot,Pop,by.x="ANO",by.y="Año",all.x=T)
       Tot3$EMpc=(Tot3$EM/Tot3$Poblacion)*1e6
       Tot3=Tot3[c("ANO","EM","Poblacion","EMpc")]
+      
+      
       output$per <- renderPlot({ 
         plot(g1)
       },height="auto")
@@ -323,6 +398,35 @@ server <- function(input, output) {
       )
       
       output$tabler=DT::renderDataTable(tablaDTR)
+      output$res <- renderPlot({ 
+        plot(g)
+      },height="auto")
+      
+      
+      
+      ### Agregando a Grafica Sectorial
+      
+      cols.a=data.frame(X1="black",X2="Reporte MinEnergía")
+      cols=rbind(cols,cols.a)
+      
+      Tots=Tot[c("ANO","Method","EM")]
+      names(Tots)=names(EmisS.melt)
+      Emis2=rbind(EmisS.melt,Tots)
+      
+      gs=ggplot(Emis2,aes(Año,Emision))+geom_line(aes(color=variable),size=1)+
+        geom_point(aes(color=variable),size=2)+theme_bw()+
+        ylab(expression("Mt"~CO[2]*"eq."))+scale_color_manual(name="Sector",breaks=cols$X2,values = cols$X1)+
+        theme(legend.position = "bottom",legend.direction = "vertical",text = element_text(size=20))+
+        geom_ribbon(data=Tot,aes(ymin = SN, ymax = SP),fill="gray50",alpha=0.2)
+
+      output$resS <- renderPlot({ 
+        plot(gs)
+      },height=700)
+      
+      
+      
+      
+      
       
     } 
     
@@ -331,21 +435,7 @@ server <- function(input, output) {
   })
   
   
-  ## Grafica Base
-  Dt2=loadWorkbook(comp_file)
-  Pop=readWorkbook(Dt2,sheet=1,cols=c(1:2)) ## Población
-  Emis=readWorkbook(Dt2,sheet=2,startRow = 2)
-  names(Emis)[1]=c("Año")
-  Emis.melt=melt(Emis,id.vars="Año",value.name = "Emision")
-  Emis.melt$variable=gsub("."," ",Emis.melt$variable,fixed=T)
-  
-  g=ggplot(Emis.melt,aes(Año,Emision))+geom_line(aes(color=variable),size=1)+
-    geom_point(aes(color=variable),size=2)+theme_bw()+
-    ylab(expression("Mt"~CO[2]*"eq."))+
-    scale_x_continuous(breaks=seq(2010,2030,2),minor_breaks = 2010:2030)+scale_y_continuous(breaks = seq(10,100,5))+
-    theme(legend.position = "bottom",legend.title = element_blank(),
-          text=element_text(size=20))+
-    scale_color_brewer(palette = "Set1")
+
   
   
   
@@ -353,7 +443,9 @@ server <- function(input, output) {
     plot(g)
   },height="auto")
 
-  
+  output$resS <- renderPlot({ 
+    plot(gs)
+  },height=700)
   
   
 }
