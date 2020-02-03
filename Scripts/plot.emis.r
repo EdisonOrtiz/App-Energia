@@ -176,8 +176,9 @@ if (SelectGraph=="Ts all")
 
 
 plot=plot+theme(legend.position = "bottom",axis.text.x = element_text(angle = 90),text = element_text(size=20))+
-  guides(col = guide_legend(ncol = 1, byrow = TRUE),fill = guide_legend(ncol = 1, byrow = TRUE),
-                                                   size = guide_legend(ncol = 1, byrow = TRUE))+
+  guides(col = guide_legend(ncol = 1, byrow = TRUE,title.position = "top"),fill = guide_legend(ncol = 1, byrow = TRUE,title.position = "top"),
+                                                   size = guide_legend(ncol = 1, byrow = TRUE,title.position = "top"))+
   expand_limits(y = 0)
+
 return(plot)
 }
