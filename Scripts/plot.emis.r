@@ -53,7 +53,7 @@ for (ipcc in checkipcc)
 }
 Dat=DAT2[DAT2$ANO>=year[1]&DAT2$ANO<=year[2],]
 it=100
-GWP=read.csv(paste0(dir.s,"./GWP.csv"))
+GWP=read.csv(paste0(dir.s,"/GWP.csv"),fileEncoding="latin1")
 
 gwp=GWP[c(4,3)]
 
