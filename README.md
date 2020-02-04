@@ -15,7 +15,7 @@ If you are using R, Rstudio or Shiny for first time:
 install.packages(c("triangle", "openxlsx", "nleqslv", "fitdistrplus", "ggplot2", "reshape2", "shiny", "DT", "imager"))
 
 5. Exit R studio
-6. Search the folder downloaded of App-Energia.git, and open App.R
+6. Search downloaded zip file from App-Energia.git, unzip and open App.R
 7. Click on "Run App" buttom to run the app.
 8. App User's Instructions are inside shiny app
 
