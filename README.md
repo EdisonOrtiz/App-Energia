@@ -12,7 +12,7 @@ If you are using R, Rstudio or Shiny for first time:
 3. Open R studio, and configure default text encoding as UTF-8: Tools->Global Options->Code->Saving->Default Text Encoding->UTF-8
 4. Install required libraries or packages typing in R Studio console:
 
-install.packages(c("triangle", "openxlsx", "nleqslv", "fitdistrplus", "ggplot2", "reshape2", "shiny", "DT", "imager"))
+install.packages(c("triangle", "openxlsx", "nleqslv", "fitdistrplus", "ggplot2", "reshape2","ggalluvial", "shiny", "DT", "imager"))
 
 5. Exit R studio
 6. Search downloaded zip file from App-Energia.git, unzip and open App.R
