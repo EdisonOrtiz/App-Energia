@@ -338,13 +338,14 @@ ECH4_2B8c=CALC(B2N,F2N,CAT="2B8c",SELECT_ACT = "REGION",SELECT_FACTS = "REGION",
 
 E2B8=rbind(ECO2_2B8b,ECH4_2B8b,ECO2_2B8c,ECH4_2B8c)
 E2B8$Sector = "Petróleo y Gas"
+
 ### Ferro niquel
 
-ECO2_2C2=CALC(B2N,F2N,CAT="2C2",SELECT_ACT = "REGION",SELECT_FACTS = "REGION",GAS="CO2",FACTS = "FE",
-               by.act = "SELECT",by.fct = "SELECT",fc=1e-3)
+#ECO2_2C2=CALC(B2N,F2N,CAT="2C2",SELECT_ACT = "REGION",SELECT_FACTS = "REGION",GAS="CO2",FACTS = "FE",
+#               by.act = "SELECT",by.fct = "SELECT",fc=1e-3)
 
-E2C2=ECO2_2C2
-E2C2$Sector="Producción de Ferroniquel"
+#E2C2=ECO2_2C2
+#E2C2$Sector="Producción de Ferroniquel"
 
 ### Difusión por embalses
 
@@ -361,7 +362,8 @@ E3B4$Sector="Sistema Interconectado Nacional"
 cat("\014")  
 print("Creando archivo R2 de compilación de resultados")
 
-R_2=rbind(E1A1,E1A3,E1B1,E1B2,E2B8,E2C2,E3B4)
+#R_2=rbind(E1A1,E1A3,E1B1,E1B2,E2B8,E2C2,E3B4) #Con ferroniquel
+R_2=rbind(E1A1,E1A3,E1B1,E1B2,E2B8,E3B4)
 
 write.csv(R_2,paste0('R2 ENE.csv'),row.names=F)
 return(R_2)
